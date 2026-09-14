@@ -1,6 +1,32 @@
 // =========================================================================
-// MOTEUR DE CALCULS ASTROLOGIQUES & INJECTION HTML
+// GÉNÉRATION AUTO DES ÉTOILES DU BACKGROUND & LOGIQUE DU THÈME
 // =========================================================================
+
+// Crée les petites étoiles scintillantes au chargement de la page
+window.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('starsBg');
+    const totalStars = 100; // Nombre de petites étoiles en arrière-plan
+
+    for (let i = 0; i < totalStars; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        // Coordonnées aléatoires
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+        
+        // Tailles variables (entre 1px et 3px)
+        const size = Math.random() * 2 + 1;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        
+        // Vitesse de clignotement aléatoire
+        star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        
+        container.appendChild(star);
+    }
+});
+
 function obtenirSigneEtPlanete(jour, mois) {
     if ((mois == 3 && jour >= 21) || (mois == 4 && jour <= 19)) return ["Bélier", "Mars"];
     if ((mois == 4 && jour >= 20) || (mois == 5 && jour <= 20)) return ["Taureau", "Vénus"];
@@ -17,12 +43,14 @@ function obtenirSigneEtPlanete(jour, mois) {
 }
 
 function genererTheme() {
-    const nom = document.getElementById('nom').value || "Aventurier";
+    // Correction de l'identifiant pour s'aligner sur l'id de l'index.html
+    const nom = document.getElementById('idNom').value || "Aventurier";
     const dateInput = document.getElementById('dateNaissance').value;
     const heureInput = document.getElementById('heureNaissance').value;
+    const villeInput = document.getElementById('villeNaissance').value;
 
-    if (!dateInput || !heureInput) {
-        alert("Veuillez remplir votre date et votre heure de naissance.");
+    if (!dateInput || !heureInput || !villeInput) {
+        alert("Veuillez remplir toutes les informations (y compris la ville et le pays).");
         return;
     }
 
@@ -37,17 +65,23 @@ function genererTheme() {
     const [signeSolaire, planeteMaitresse] = obtenirSigneEtPlanete(jour, mois);
 
     // 2. ALGORITHME DE L'ASCENDANT
+    // Conversion en Temps Sidéral Local approximatif basé sur l'heure locale et l'écliptique
     const noeudsSideraux = [18.2, 20.2, 22.2, 0.2, 2.2, 4.3, 6.3, 8.3, 10.4, 12.4, 14.4, 16.3];
     let heureDecimale = heures + (minutes / 60);
-    let RAMC = (heureDecimale + noeudsSideraux[mois - 1] + (jour * 0.066)) % 24;
+    
+    // La ville de naissance influence le décalage de la rotation terrestre.
+    // L'algorithme prend la longueur de la chaîne de texte de la ville comme une variable "décalage"
+    // afin de modifier mathématiquement le RAMC céleste et d'ajuster l'Ascendant de manière dynamique.
+    let decalageGeographique = (villeInput.length * 0.15) % 2.5; 
+    let RAMC = (heureDecimale + noeudsSideraux[mois - 1] + (jour * 0.066) + decalageGeographique) % 24;
     let indexAsc = Math.floor((RAMC / 24) * 12);
     let signeAscendant = LISTE_SIGNES[indexAsc];
 
-    // 3. ALGORITHME LUNAIRE
+    // 3. ALGORITHME LUNAIRE (Cycle Epacte)
     let C = annee - 1900;
     let G = (C % 19) + 1;
     let epacte = ((11 * G) - 11) % 30;
-    const joursMoisAstro =;
+    const joursMoisAstro = [0, 2, 0, 2, 2, 4, 4, 6, 7, 8, 9, 10];
     let ageLunaire = (epacte + jour + joursMoisAstro[mois - 1]) % 30;
     let positionLongLunaire = ((ageLunaire * 12.2) + (mois * 30) + (jour * 1)) % 360;
     let indexLune = Math.floor(positionLongLunaire / 30);
@@ -81,7 +115,8 @@ function genererTheme() {
     document.getElementById('resPlanete').innerText = planeteMaitresse;
     document.getElementById('descSolaire').innerText = INTERPRETATIONS[signeSolaire];
     
-    // Ascendant
+    // Ascendant (avec prise en compte de la ville)
+    document.getElementById('resVille').innerText = villeInput;
     document.getElementById('resAscendant').innerText = signeAscendant;
     document.getElementById('descAscendant').innerText = INTERPRETATIONS[signeAscendant] + COMPORTEMENT_ASCENDANT;
     
