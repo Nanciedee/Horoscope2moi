@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur Astrologique Avancé</title>
+    <!-- On relie ici le fichier de style CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>🔮 Votre Thème Astro Complet</h1>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="nom">Votre Prénom :</label>
+            <input type="text" id="idNom" placeholder="Ex: Jean" required>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label for="dateNaissance">Date de Naissance :</label>
+            <input type="date" id="dateNaissance" required>
+        </div>
+        <div class="form-group">
+            <label for="heureNaissance">Heure de Naissance :</label>
+            <input type="time" id="heureNaissance" value="12:00" required>
+        </div>
+    </div>
+    <button onclick="genererTheme()">Calculer mon thème & interprétation</button>
+
+    <div id="resultatBox" class="resultat">
+        <h2 id="resBonjour">Analyse personnalisée</h2>
+        
+        <div class="section-title">🪐 Signe Solaire & Planète Maîtresse</div>
+        <div class="bloc-texte">Votre essence : <span id="resOccidental" class="bold"></span> (Planète : <span id="resPlanete" class="bold"></span>).<br><span id="descSolaire"></span></div>
+        
+        <div class="section-title">🌅 Ascendant</div>
+        <div class="bloc-texte">Votre masque social & comportement externe : <span id="resAscendant" class="bold"></span>.<br><span id="descAscendant"></span></div>
+
+        <div class="section-title">🌙 Signe Lunaire</div>
+        <div class="bloc-texte">Votre jardin secret & vos émotions : <span id="resLunaire" class="bold"></span>.<br><span id="descLunaire"></span></div>
+
+        <div class="section-title">🐉 Astrologie Chinoise</div>
+        <div class="bloc-texte">Votre animal protecteur : <span id="resChinois" class="bold"></span>.<br><span id="descChinois"></span></div>
+        
+        <div class="section-title">🔢 Numérologie</div>
+        <div class="bloc-texte">Votre vibration de vie : <span id="resNumerologie" class="bold"></span>.<br><span id="descNumerologie"></span></div>
+    </div>
+</div>
+
+<!-- Liaisons fondamentales aux fichiers JavaScript (l'ordre est important !) -->
+<script src="data.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
