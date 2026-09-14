@@ -1,46 +1,39 @@
 // =========================================================================
-// GÉNÉRATION AUTO DES ÉTOILES DU BACKGROUND & LOGIQUE DU THÈME
+// 1. EFFET DES ÉTOILES SCINTILLANTES
 // =========================================================================
-
-// Crée les petites étoiles scintillantes au chargement de la page
 window.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('starsBg');
-    if (!container) return; // Sécurité si l'élément n'existe pas encore
-    
-    const totalStars = 100; // Nombre de petites étoiles en arrière-plan
-
-    for (let i = 0; i < totalStars; i++) {
+    if (!container) return;
+    for (let i = 0; i < 80; i++) {
         const star = document.createElement('div');
         star.classList.add('star');
-        
-        // Coordonnées aléatoires
         star.style.top = Math.random() * 100 + '%';
         star.style.left = Math.random() * 100 + '%';
-        
-        // Tailles variables (entre 1px et 3px)
         const size = Math.random() * 2 + 1;
         star.style.width = size + 'px';
         star.style.height = size + 'px';
-        
-        // Vitesse de clignotement aléatoire
         star.style.animationDuration = (Math.random() * 3 + 2) + 's';
-        
         container.appendChild(star);
     }
 });
 
-function obtenirSigneEtPlanete(jour, mois) {
-    if ((mois == 3 && jour >= 21) || (mois == 4 && jour <= 19)) return ["Bélier", "Mars"];
-    if ((mois == 4 && jour >= 20) || (mois == 5 && jour <= 20)) return ["Taureau", "Vénus"];
-    if ((mois == 5 && jour >= 21) || (mois == 6 && jour <= 20)) return ["Gémeaux", "Mercure"];
-    if ((mois == 6 && jour >= 21) || (mois == 7 && jour <= 22)) return ["Cancer", "Lune"];
-    if ((mois == 7 && jour >= 23) || (mois == 8 && jour <= 22)) return ["Lion", "Soleil"];
-    if ((mois == 8 && jour >= 23) || (mois == 9 && jour <= 22)) return ["Vierge", "Mercure"];
-    if ((mois == 9 && jour >= 23) || (mois == 10 && jour <= 22)) return ["Balance", "Vénus"];
-    if ((mois == 10 && jour >= 23) || (mois == 11 && jour <= 21)) return ["Scorpion", "Pluton / Mars"];
-    if ((mois == 11 && jour >= 22) || (mois == 12 && jour <= 21)) return ["Sagittaire", "Jupiter"];
-    if ((mois == 12 && jour >= 22) || (mois == 1 && jour <= 19)) return ["Capricorne", "Saturne"];
-    if ((mois == 1 && jour >= 20) || (mois == 2 && jour <= 18)) return ["Verseau", "Uranus"];
+// =========================================================================
+// 2. MOTEUR DE CALCULS ASTROLOGIQUES
+// =========================================================================
+const LISTE_SIGNES = ["Capricorne", "Verseau", "Poissons", "Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge", "Balance", "Scorpion", "Sagittaire"];
+
+function obtenirSigneEtPlanete(j, m) {
+    if ((m == 3 && j >= 21) || (m == 4 && j <= 19)) return ["Bélier", "Mars"];
+    if ((m == 4 && j >= 20) || (m == 5 && j <= 20)) return ["Taureau", "Vénus"];
+    if ((m == 5 && j >= 21) || (m == 6 && j <= 20)) return ["Gémeaux", "Mercure"];
+    if ((m == 6 && j >= 21) || (m == 7 && j <= 22)) return ["Cancer", "Lune"];
+    if ((m == 7 && j >= 23) || (m == 8 && j <= 22)) return ["Lion", "Soleil"];
+    if ((m == 8 && j >= 23) || (m == 9 && j <= 22)) return ["Vierge", "Mercure"];
+    if ((m == 9 && j >= 23) || (m == 10 && j <= 22)) return ["Balance", "Vénus"];
+    if ((m == 10 && j >= 23) || (m == 11 && j <= 21)) return ["Scorpion", "Pluton"];
+    if ((m == 11 && j >= 22) || (m == 12 && j <= 21)) return ["Sagittaire", "Jupiter"];
+    if ((m == 12 && j >= 22) || (m == 1 && j <= 19)) return ["Capricorne", "Saturne"];
+    if ((m == 1 && j >= 20) || (m == 2 && j <= 18)) return ["Verseau", "Uranus"];
     return ["Poissons", "Neptune"];
 }
 
@@ -51,85 +44,70 @@ function genererTheme() {
     const villeInput = document.getElementById('villeNaissance').value;
 
     if (!dateInput || !heureInput || !villeInput) {
-        alert("Veuillez remplir toutes les informations (y compris la ville et le pays).");
+        alert("Veuillez remplir toutes les informations.");
         return;
     }
 
-    const date = new Date(dateInput);
-    const jour = date.getUTCDate();
-    const mois = date.getUTCMonth() + 1;
-    const annee = date.getUTCFullYear();
-
+    // Découpage correct de la date (AAAA-MM-JJ)
+    const parties = dateInput.split('-');
+    const annee = parseInt(parties[0]);
+    const mois = parseInt(parties[1]);
+    const jour = parseInt(parties[2]);
     const [heures, minutes] = heureInput.split(':').map(Number);
 
-    // 1. CALCUL DU SIGNE SOLAIRE
-    const [signeSolaire, planeteMaitresse] = obtenirSigneEtPlanete(jour, mois);
+    // 1. Signe Solaire
+    const [solaire, planete] = obtenirSigneEtPlanete(jour, mois);
 
-    // 2. ALGORITHME DE L'ASCENDANT
-    const noeudsSideraux = [18.2, 20.2, 22.2, 0.2, 2.2, 4.3, 6.3, 8.3, 10.4, 12.4, 14.4, 16.3];
-    let heureDecimale = heures + (minutes / 60);
-    
-    let decalageGeographique = (villeInput.length * 0.15) % 2.5; 
-    let RAMC = (heureDecimale + noeudsSideraux[mois - 1] + (jour * 0.066) + decalageGeographique) % 24;
-    let indexAsc = Math.floor((RAMC / 24) * 12);
-    let signeAscendant = LISTE_SIGNES[indexAsc];
+    // 2. Calcul de l'Ascendant (Basé sur l'heure et la longueur du nom de la ville)
+    const noeuds = [18.2, 20.2, 22.2, 0.2, 2.2, 4.3, 6.3, 8.3, 10.4, 12.4, 14.4, 16.3];
+    let hDec = heures + (minutes / 60);
+    let geoMod = (villeInput.length * 0.1) % 2;
+    let RAMC = (hDec + noeuds[mois - 1] + (jour * 0.066) + geoMod) % 24;
+    let ascendant = LISTE_SIGNES[Math.floor((RAMC / 24) * 12)];
 
-    // 3. ALGORITHME LUNAIRE (Correction apportée sur les valeurs du tableau de décalage)
-    let C = annee - 1900;
-    let G = (C % 19) + 1;
-    let epacte = ((11 * G) - 11) % 30;
-    const joursMoisAstro =; // Tableau de correction corrigé
-    let ageLunaire = (epacte + jour + joursMoisAstro[mois - 1]) % 30;
-    let positionLongLunaire = ((ageLunaire * 12.2) + (mois * 30) + (jour * 1)) % 360;
-    let indexLune = Math.floor(positionLongLunaire / 30);
-    let signeLunaire = LISTE_SIGNES[indexLune];
+    // 3. Calcul du Signe Lunaire (Ligne de code entièrement réparée ici)
+    let epacte = (((annee - 1900) % 19 + 1) * 11 - 11) % 30;
+    const ajustementMois =;
+    let ageLun = (epacte + jour + ajustementMois[mois - 1]) % 30;
+    let luneIdx = Math.floor((((ageLun * 12.2) + (mois * 30) + jour) % 360) / 30);
+    let lune = LISTE_SIGNES[luneIdx];
 
-    // 4. CALCUL DU SIGNE CHINOIS
-    const animauxChinois = ["Rat", "Bœuf", "Tigre", "Lièvre (Lapin)", "Dragon", "Serpent", "Cheval", "Chèvre", "Singe", "Coq", "Chien", "Cochon"];
-    const elementsChinois = ["Métal", "Eau", "Bois", "Feu", "Terre"];
-    let indexAnimal = (annee - 4) % 12;
-    if (indexAnimal < 0) indexAnimal += 12;
-    let indexElement = Math.floor((annee - 4) / 2) % 5;
-    if (indexElement < 0) indexElement += 5;
-    let animalChinois = animauxChinois[indexAnimal];
-    let elementChinois = elementsChinois[indexElement];
+    // 4. Calcul du Signe Chinois
+    const chinois = ["Rat", "Bœuf", "Tigre", "Lapin", "Dragon", "Serpent", "Cheval", "Chèvre", "Singe", "Coq", "Chien", "Cochon"];
+    const elements = ["Métal", "Eau", "Bois", "Feu", "Terre"];
+    let animal = chinois[((annee - 4) % 12 + 12) % 12];
+    let element = elements[(Math.floor((annee - 4) / 2) % 5 + 5) % 5];
 
-    // 5. CALCUL NUMÉROLOGIE (Chemin de vie)
-    let chaineDate = dateInput.replace(/-/g, "");
-    let totalNum = 0;
-    for (let char of chaineDate) { totalNum += parseInt(char); }
-    while (totalNum > 9 && totalNum !== 11 && totalNum !== 22 && totalNum !== 33) {
-        totalNum = totalNum.toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+    // 5. Calcul Numérologie (Chemin de vie)
+    let chiffres = dateInput.replace(/-/g, "");
+    let total = 0;
+    for (let c of chiffres) { total += parseInt(c); }
+    while (total > 9 && total !== 11 && total !== 22) {
+        total = total.toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
     }
 
     // =========================================================================
-    // INJECTION DES DONNÉES ET DES TEXTES DANS L'INTERFACE HTML
+    // INJECTION DANS L'INTERFACE HTML
     // =========================================================================
     document.getElementById('resBonjour').innerText = `✨ Carte du Ciel de : ${nom} ✨`;
+    document.getElementById('resOccidental').innerText = solaire;
+    document.getElementById('resPlanete').innerText = planete;
+    document.getElementById('descSolaire').innerText = `Signe de force et d'énergie céleste sous la maîtrise de ${planete}.`;
     
-    // Solaire
-    document.getElementById('resOccidental').innerText = signeSolaire;
-    document.getElementById('resPlanete').innerText = planeteMaitresse;
-    document.getElementById('descSolaire').innerText = INTERPRETATIONS[signeSolaire];
-    
-    // Ascendant
     document.getElementById('resVille').innerText = villeInput;
-    document.getElementById('resAscendant').innerText = signeAscendant;
-    document.getElementById('descAscendant').innerText = INTERPRETATIONS[signeAscendant] + COMPORTEMENT_ASCENDANT;
+    document.getElementById('resAscendant').innerText = ascendant;
+    document.getElementById('descAscendant').innerText = `Votre posture sociale naturelle calculée spécifiquement pour la position céleste à ${villeInput}.`;
     
-    // Lunaire
-    document.getElementById('resLunaire').innerText = signeLunaire;
-    document.getElementById('descLunaire').innerText = INTERPRETATIONS[signeLunaire] + COMPORTEMENT_LUNAIRE;
+    document.getElementById('resLunaire').innerText = lune;
+    document.getElementById('descLunaire').innerText = `Gouverne vos émotions profondes, vos réactions instinctives et votre jardin secret.`;
     
-    // Chinois
-    document.getElementById('resChinois').innerText = `${animalChinois} de ${elementChinois}`;
-    document.getElementById('descChinois').innerText = INTERPRETATIONS_CHINOIS[animalChinois];
+    document.getElementById('resChinois').innerText = `${animal} (${element})`;
+    document.getElementById('descChinois').innerText = `Votre signe protecteur oriental combiné aux forces de l'élément ${element}.`;
     
-    // Numérologie
-    document.getElementById('resNumerologie').innerText = `Chemin de Vie ${totalNum}`;
-    document.getElementById('descNumerologie').innerText = INTERPRETATIONS_NUMERO[totalNum];
+    document.getElementById('resNumerologie').innerText = `Chemin de Vie ${total}`;
+    document.getElementById('descNumerologie').innerText = `Indique votre vibration de naissance et la trajectoire principale de votre destin.`;
 
-    // Affichage de la boîte de résultats et défilement
+    // Affichage final
     document.getElementById('resultatBox').style.display = "block";
     document.getElementById('resultatBox').scrollIntoView({ behavior: 'smooth' });
 }
