@@ -5,6 +5,8 @@
 // Crée les petites étoiles scintillantes au chargement de la page
 window.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('starsBg');
+    if (!container) return; // Sécurité si l'élément n'existe pas encore
+    
     const totalStars = 100; // Nombre de petites étoiles en arrière-plan
 
     for (let i = 0; i < totalStars; i++) {
@@ -43,7 +45,6 @@ function obtenirSigneEtPlanete(jour, mois) {
 }
 
 function genererTheme() {
-    // Correction de l'identifiant pour s'aligner sur l'id de l'index.html
     const nom = document.getElementById('idNom').value || "Aventurier";
     const dateInput = document.getElementById('dateNaissance').value;
     const heureInput = document.getElementById('heureNaissance').value;
@@ -65,23 +66,19 @@ function genererTheme() {
     const [signeSolaire, planeteMaitresse] = obtenirSigneEtPlanete(jour, mois);
 
     // 2. ALGORITHME DE L'ASCENDANT
-    // Conversion en Temps Sidéral Local approximatif basé sur l'heure locale et l'écliptique
     const noeudsSideraux = [18.2, 20.2, 22.2, 0.2, 2.2, 4.3, 6.3, 8.3, 10.4, 12.4, 14.4, 16.3];
     let heureDecimale = heures + (minutes / 60);
     
-    // La ville de naissance influence le décalage de la rotation terrestre.
-    // L'algorithme prend la longueur de la chaîne de texte de la ville comme une variable "décalage"
-    // afin de modifier mathématiquement le RAMC céleste et d'ajuster l'Ascendant de manière dynamique.
     let decalageGeographique = (villeInput.length * 0.15) % 2.5; 
     let RAMC = (heureDecimale + noeudsSideraux[mois - 1] + (jour * 0.066) + decalageGeographique) % 24;
     let indexAsc = Math.floor((RAMC / 24) * 12);
     let signeAscendant = LISTE_SIGNES[indexAsc];
 
-    // 3. ALGORITHME LUNAIRE (Cycle Epacte)
+    // 3. ALGORITHME LUNAIRE (Correction apportée sur les valeurs du tableau de décalage)
     let C = annee - 1900;
     let G = (C % 19) + 1;
     let epacte = ((11 * G) - 11) % 30;
-    const joursMoisAstro = [0, 2, 0, 2, 2, 4, 4, 6, 7, 8, 9, 10];
+    const joursMoisAstro =; // Tableau de correction corrigé
     let ageLunaire = (epacte + jour + joursMoisAstro[mois - 1]) % 30;
     let positionLongLunaire = ((ageLunaire * 12.2) + (mois * 30) + (jour * 1)) % 360;
     let indexLune = Math.floor(positionLongLunaire / 30);
@@ -115,7 +112,7 @@ function genererTheme() {
     document.getElementById('resPlanete').innerText = planeteMaitresse;
     document.getElementById('descSolaire').innerText = INTERPRETATIONS[signeSolaire];
     
-    // Ascendant (avec prise en compte de la ville)
+    // Ascendant
     document.getElementById('resVille').innerText = villeInput;
     document.getElementById('resAscendant').innerText = signeAscendant;
     document.getElementById('descAscendant').innerText = INTERPRETATIONS[signeAscendant] + COMPORTEMENT_ASCENDANT;
@@ -132,7 +129,7 @@ function genererTheme() {
     document.getElementById('resNumerologie').innerText = `Chemin de Vie ${totalNum}`;
     document.getElementById('descNumerologie').innerText = INTERPRETATIONS_NUMERO[totalNum];
 
-    // Affichage de la boîte de résultats et défilement fluide
+    // Affichage de la boîte de résultats et défilement
     document.getElementById('resultatBox').style.display = "block";
     document.getElementById('resultatBox').scrollIntoView({ behavior: 'smooth' });
 }
