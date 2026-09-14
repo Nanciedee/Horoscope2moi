@@ -9,14 +9,18 @@
 </head>
 <body>
 
+<!-- Conteneur pour l'effet de fond étoilé animé -->
+<div class="stars-container" id="starsBg"></div>
+
 <div class="container">
     <h1>🔮 Votre Thème Astro Complet</h1>
     <div class="form-row">
         <div class="form-group">
-            <label for="nom">Votre Prénom :</label>
+            <label for="idNom">Votre Prénom :</label>
             <input type="text" id="idNom" placeholder="Ex: Jean" required>
         </div>
     </div>
+    
     <div class="form-row">
         <div class="form-group">
             <label for="dateNaissance">Date de Naissance :</label>
@@ -27,6 +31,14 @@
             <input type="time" id="heureNaissance" value="12:00" required>
         </div>
     </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="villeNaissance">Ville & Pays de Naissance :</label>
+            <input type="text" id="villeNaissance" placeholder="Ex: Paris, France" required>
+        </div>
+    </div>
+    
     <button onclick="genererTheme()">Calculer mon thème & interprétation</button>
 
     <div id="resultatBox" class="resultat">
@@ -36,7 +48,7 @@
         <div class="bloc-texte">Votre essence : <span id="resOccidental" class="bold"></span> (Planète : <span id="resPlanete" class="bold"></span>).<br><span id="descSolaire"></span></div>
         
         <div class="section-title">🌅 Ascendant</div>
-        <div class="bloc-texte">Votre masque social & comportement externe : <span id="resAscendant" class="bold"></span>.<br><span id="descAscendant"></span></div>
+        <div class="bloc-texte">Calculé pour <span id="resVille" class="bold"></span>. Votre masque social : <span id="resAscendant" class="bold"></span>.<br><span id="descAscendant"></span></div>
 
         <div class="section-title">🌙 Signe Lunaire</div>
         <div class="bloc-texte">Votre jardin secret & vos émotions : <span id="resLunaire" class="bold"></span>.<br><span id="descLunaire"></span></div>
