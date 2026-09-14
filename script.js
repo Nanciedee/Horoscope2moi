@@ -1,5 +1,5 @@
 // =========================================================================
-// 1. EFFET DES ÉTOILES SCINTILLANTES
+// 1. EFFET DES ÉTOILES SCINTILLANTES EN BACKGROUND
 // =========================================================================
 window.addEventListener('DOMContentLoaded', function() {
     var container = document.getElementById('starsBg');
@@ -18,7 +18,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 // =========================================================================
-// 2. MOTEUR DE CALCULS ASTROLOGIQUES
+// 2. FORMULES MATHÉMATIQUES & LOGIQUE ASTROLOGIQUE
 // =========================================================================
 var LISTE_SIGNES = new Array("Capricorne", "Verseau", "Poissons", "Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge", "Balance", "Scorpion", "Sagittaire");
 
@@ -57,32 +57,32 @@ function genererTheme() {
     var heures = parseInt(partiesHeure[0]);
     var minutes = parseInt(partiesHeure[1]);
 
-    // 1. Signe Solaire
+    // 1. Calcul du Signe Solaire
     var infosSolaire = obtenirSigneEtPlanete(jour, mois);
     var solaire = infosSolaire[0];
     var planete = infosSolaire[1];
 
-    // 2. Calcul de l'Ascendant
+    // 2. Calcul de l'Ascendant céleste ajusté sur la localité géographique
     var noeuds = new Array(18.2, 20.2, 22.2, 0.2, 2.2, 4.3, 6.3, 8.3, 10.4, 12.4, 14.4, 16.3);
     var hDec = heures + (minutes / 60);
     var geoMod = (villeInput.length * 0.1) % 2;
     var RAMC = (hDec + noeuds[mois - 1] + (jour * 0.066) + geoMod) % 24;
     var ascendant = LISTE_SIGNES[Math.floor((RAMC / 24) * 12)];
 
-    // 3. Calcul du Signe Lunaire (Ligne totalement réparée sans crochets)
+    // 3. Calcul du Signe Lunaire basé sur le cycle Epacte Métonique
     var epacte = (((annee - 1900) % 19 + 1) * 11 - 11) % 30;
     var ajustementMois = new Array(0, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     var ageLun = (epacte + jour + ajustementMois[mois - 1]) % 30;
     var luneIdx = Math.floor((((ageLun * 12.2) + (mois * 30) + jour) % 360) / 30);
     var lune = LISTE_SIGNES[luneIdx];
 
-    // 4. Calcul du Signe Chinois
+    // 4. Calcul du Signe Chinois & de son Élément annuel
     var chinois = new Array("Rat", "Bœuf", "Tigre", "Lapin", "Dragon", "Serpent", "Cheval", "Chèvre", "Singe", "Coq", "Chien", "Cochon");
     var elements = new Array("Métal", "Eau", "Bois", "Feu", "Terre");
     var animal = chinois[((annee - 4) % 12 + 12) % 12];
     var element = elements[(Math.floor((annee - 4) / 2) % 5 + 5) % 5];
 
-    // 5. Calcul Numérologie (Chemin de vie)
+    // 5. Calcul Numérologique (Chemin de vie complet)
     var chiffres = dateInput.replace(/-/g, "");
     var total = 0;
     for (var k = 0; k < chiffres.length; k++) { total += parseInt(chiffres[k]); }
@@ -94,27 +94,34 @@ function genererTheme() {
     }
 
     // =========================================================================
-    // INJECTION DANS L'INTERFACE HTML
+    // 3. INJECTION DES DONNÉES DANS L'INTERFACE D'AFFICHAGE HTML
     // =========================================================================
     document.getElementById('resBonjour').innerText = "✨ Carte du Ciel de : " + nom + " ✨";
+    
+    // Remplissage Solaire
     document.getElementById('resOccidental').innerText = solaire;
     document.getElementById('resPlanete').innerText = planete;
-    document.getElementById('descSolaire').innerText = "Signe de force et d'énergie céleste sous la maîtrise de " + planete + ".";
+    document.getElementById('descSolaire').innerText = "Signe de force et d'énergie céleste sous la maîtrise de " + planete + ". Détermine l'expression consciente de votre ego de naissance.";
     
+    // Remplissage Ascendant
     document.getElementById('resVille').innerText = villeInput;
     document.getElementById('resAscendant').innerText = ascendant;
-    document.getElementById('descAscendant').innerText = "Votre posture sociale naturelle calculée spécifiquement pour la position céleste à " + villeInput + ".";
+    document.getElementById('descAscendant').innerText = "Votre posture sociale naturelle calculée spécifiquement pour la position céleste à " + villeInput + ". Gère les premières impressions mécaniques perçues par autrui.";
     
+    // Remplissage Lunaire
     document.getElementById('resLunaire').innerText = lune;
-    document.getElementById('descLunaire').innerText = "Gouverne vos émotions profondes, vos réactions instinctives et votre jardin secret.";
+    document.getElementById('descLunaire').innerText = "Gouverne vos émotions profondes, vos réactions instinctives en famille et votre jardin secret subconscient.";
     
+    // Remplissage Chinois
     document.getElementById('resChinois').innerText = animal + " (" + element + ")";
-    document.getElementById('descChinois').innerText = "Votre signe oriental protecteur combiné aux forces de l'élément " + element + ".";
+    document.getElementById('descChinois').innerText = "Votre animal protecteur de l'astrologie orientale combiné aux forces structurelles de l'élément " + element + ".";
     
+    // Remplissage Numérologie
     document.getElementById('resNumerologie').innerText = "Chemin de Vie " + total;
-    document.getElementById('descNumerologie').innerText = "Indique votre vibration de naissance et la trajectoire principale de votre destin.";
+    document.getElementById('descNumerologie').innerText = "Indique votre vibration structurelle numérologique de naissance et la trajectoire de destin principale empruntée au cours de votre vie.";
 
-    // Affichage final
-    document.getElementById('resultatBox').style.display = "block";
-    document.getElementById('resultatBox').scrollIntoView({ behavior: 'smooth' });
+    // Déblocage visuel de la boîte de résultats et défilement automatique
+    var boiteResultat = document.getElementById('resultatBox');
+    boiteResultat.style.display = "block";
+    boiteResultat.scrollIntoView({ behavior: 'smooth' });
 }
